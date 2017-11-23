@@ -4,22 +4,23 @@ import numpy as np
 from statistics import median, mean
 from collections import Counter
 from absl import flags
+import time
 
 FLAGS = flags.FLAGS
-flags.DEFINE_string("env", "CartPole-v0", "Środowisko openai")
-flags.DEFINE_integer("episodes", 2000, "Ilość gier do zagrania")
+flags.DEFINE_integer("episodes", 100 * 100, "Ilość gier do zagrania")
 flags.DEFINE_integer("frames", 4000, "Maksymalna ilość klatek/gra")
 flags.DEFINE_float("visualize", 0, "Czy renderować grę")
 
-def mean(numbers):
-    return float(sum(numbers)) / max(len(numbers), 1)
+def format_float(f):
+    return format(f, '07.2f')
 
-def run_agent(agent, learn=True):
-    """Executes predefined number of steps, actions are choosen by agent"""
-    """If learn = true learn method will be called on agent """
-    env = gym.make(FLAGS.env)
+def run_agent(agent, env):
+    """Executes predefined number of steps, actions are choosen by agent, environment should be openai gym environemnt"""
     env.reset()
     rewards = []
+    means = []
+    start = time.time()
+    
 
     agent.setup()
     # Each of these is its own game.
@@ -27,6 +28,7 @@ def run_agent(agent, learn=True):
         for episode in range(FLAGS.episodes):
             observation = env.reset()
             # this is each frame, up to 200...but we wont make it that far.
+            current_reward = 0
             for t in range(FLAGS.frames):
                 # This will display the environment
                 # Only display if you really want to see it.
@@ -34,16 +36,22 @@ def run_agent(agent, learn=True):
                 if FLAGS.visualize != 0:
                     env.render()
 
-                action = agent.action(observation, env.action_space)
+                action = agent.act(observation, env.action_space)
                 observation, reward, done, info = env.step(action)
+                agent.observe(observation, reward, action)
+                current_reward += reward
                 if done:
-                    rewards.append(reward)
+                    rewards.append(current_reward)
                     if len(rewards) > 100:
                         rewards.pop(0)
                     if episode > 0 and ((episode + 1) % 100 == 0):
-                        print("100 episodes mean reward: " + str(mean(rewards)))
+                        mean = np.mean(rewards)
+                        means.append(mean)
+                        print("100 episodes reward mean: " + format_float(mean) )
                     break
-                if learn:
-                    agent.learn(observation, reward, action)
+            agent.next_episode(episode)
+            
+        end = time.time()
+        print("Finished with best mean: " + format_float(max(means)) + " in " + str(end-start) + "s")
     finally:
         agent.dispose()
