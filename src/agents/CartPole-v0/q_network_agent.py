@@ -1,4 +1,4 @@
-from src.lib.base_agent import BaseAgent
+from src.lib.tensorflow_agent import TensorflowAgent
 
 
 import tensorflow as tf
@@ -6,7 +6,7 @@ import tensorflow.contrib.slim as slim
 import numpy as np
 import gym
 import matplotlib.pyplot as plt
-
+import shutil
 
 from absl import flags
 flags.DEFINE_float("gamma", 0.99, "Współczynnik określający, jak ważne są przyszłe doświadczenia")
@@ -15,19 +15,18 @@ flags.DEFINE_float("hidden", 8, "Współczynnik określający szybkość uczenia
 
 
 
-class QNetworkAgent(BaseAgent):
+class QNetworkAgent(TensorflowAgent):
     """Test agent executing random ctions"""
     def __init__(self):
+        TensorflowAgent.__init__(self)
+
         self.gamma = flags.FLAGS.gamma
         self.lr = flags.FLAGS.lr
 
         # parametry dla setup
-        s_size = 4 # ilość wjeść
-        a_size = 2 # ilość wyjść
-        h_size = 8 # ukryta warstwa
-
-        self.sess = tf.Session()
-        self.sess.__enter__()
+        s_size = 4 # warstwa obserwacji
+        h_size = 8 # warstwa ukryta
+        a_size = 2 # warstwa akcji
 
         #feed forwards część
         self.state_in= tf.placeholder(shape=[None,s_size],dtype=tf.float32) # placeholder na bufor z obserwajcą
@@ -54,18 +53,12 @@ class QNetworkAgent(BaseAgent):
         for idx,var in enumerate(tvars):
             placeholder = tf.placeholder(tf.float32,name=str(idx)+'_holder')
             self.gradient_holders.append(placeholder)
-        # 
 
         self.gradients = tf.gradients(self.loss,tvars)
         #oblicza pochodne cząstkowe? po funkcji loss,
         
         optimizer = tf.train.AdamOptimizer(learning_rate=self.lr)
         self.update_batch = optimizer.apply_gradients(zip(self.gradient_holders,tvars))
-
-
-    def dispose(self):
-        if self.sess:
-            self.sess.__exit__(None, None, None)
 
     def setup(self):
         
@@ -93,6 +86,10 @@ class QNetworkAgent(BaseAgent):
     def next_episode(self, episode):
         #Update the network.
         sess = self.sess
+
+        if len(self.memory_buffer) == 0:
+            return
+
         memory_buffer = np.array(self.memory_buffer)
         self.memory_buffer = []
         memory_buffer[:,2] = self.discount_rewards(memory_buffer[:,2])
@@ -121,3 +118,16 @@ class QNetworkAgent(BaseAgent):
             running_add = running_add * self.gamma + r[t]
             discounted_r[t] = running_add
         return discounted_r
+
+    def save(self, fileName):
+        import os
+        if not os.path.exists(fileName):
+            os.makedirs(fileName)
+        else:
+            shutil.rmtree(fileName)
+        saver = tf.train.Saver(tf.trainable_variables())
+        saver.save(self.sess, fileName)
+
+    def load(self, fileName):
+        saver = tf.train.Saver(tf.trainable_variables())
+        saver.restore(self.sess, fileName)

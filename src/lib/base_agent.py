@@ -13,3 +13,15 @@ class BaseAgent:
 
     def next_episode(self, episode):
         pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        pass
+    
+    def save(self, fileName):
+        pass
+    
+    def load(self, fileName):
+        pass

@@ -1,3 +1,3 @@
 from src.main import run
 
-run(True)
+run(False)
