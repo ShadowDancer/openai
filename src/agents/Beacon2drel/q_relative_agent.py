@@ -9,13 +9,13 @@ import matplotlib.pyplot as plt
 import shutil
 
 from absl import flags
-flags.DEFINE_float("gamma", 0.99, "Współczynnik określający, jak ważne są przyszłe doświadczenia")
+flags.DEFINE_float("gamma", 0.9, "Współczynnik określający, jak ważne są przyszłe doświadczenia")
 flags.DEFINE_float("lr", 1e-2, "Współczynnik określający szybkość uczenia")
 flags.DEFINE_float("hidden", 8, "Współczynnik określający szybkość uczenia")
 
 
 
-class QNetworkAgent(TensorflowAgent):
+class QRelativeAgent(TensorflowAgent):
     """Test agent executing random ctions"""
     def __init__(self):
         TensorflowAgent.__init__(self)
@@ -24,13 +24,13 @@ class QNetworkAgent(TensorflowAgent):
         self.lr = flags.FLAGS.lr
 
         # parametry dla setup
-        s_size = 4 # warstwa obserwacji
-        h_size = 8 # warstwa ukryta
-        a_size = 2 # warstwa akcji
+        s_size = 64*64 # warstwa obserwacji
+        h_size = 64*64 # warstwa ukryta
+        a_size = 8 # warstwa akcji
 
         #feed forwards część
         self.state_in= tf.placeholder(shape=[None,s_size],dtype=tf.float32) # placeholder na bufor z obserwajcą
-        hidden = slim.fully_connected(self.state_in,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta
+        hidden = slim.fully_connected(self.state_in,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta    
         #funkcja aktywacji: x > 0           Computes rectified linear: max(features, 0).
         self.output = slim.fully_connected(hidden,a_size,activation_fn =tf.nn.softmax,biases_initializer=None) # bufor z akcjami
         # softmax :/
@@ -44,7 +44,9 @@ class QNetworkAgent(TensorflowAgent):
         self.reward_holder = tf.placeholder(shape=[None],dtype=tf.float32)  # bufor na nagrodę
         self.action_holder = tf.placeholder(shape=[None],dtype=tf.int32)    # bufor na akcję
         self.indexes = tf.range(0, tf.shape(self.output)[0]) * tf.shape(self.output)[1] + self.action_holder
+        # utwórz tablicę o rozmiarze outputa, która zawiera indeksy wybranych akcji
         self.responsible_outputs = tf.gather(tf.reshape(self.output, [-1]), self.indexes)
+        # utwórz macierz o rozmiarze outputa, która zawiera 
         self.loss = -tf.reduce_mean(tf.log(self.responsible_outputs)*self.reward_holder)
 
         #???
@@ -76,6 +78,7 @@ class QNetworkAgent(TensorflowAgent):
         #Probabilistically pick an action given our network outputs.
         a_dist = sess.run(self.output,feed_dict={self.state_in:[observation]})
         self.a_dist = a_dist
+        
         a = np.random.choice(a_dist[0],p=a_dist[0])
         a = np.argmax(a_dist == a)
         return a

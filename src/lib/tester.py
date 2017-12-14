@@ -49,7 +49,7 @@ def run_agent(agent, env, learn=True):
             observation, reward, done, info = env.step(action)
             if learn:    
                 agent.observe(observation, reward, action)
-            current_reward += reward
+            current_reward = reward
             if done:
                 rewards.append(current_reward)
                 if len(rewards) > 100:

@@ -1,0 +1,145 @@
+Standardowa sieć z cardpole'a nie działa
+
+Random agent: 
+
+
+Struktura sieci:
+Input 64
+Hidden 64
+Hidden 64
+Output 2 - softmax
+
+
+Dodanie drugiej ukrytej warstwy nie pomaga, sieć wpada w lokalne minimum wybierając cały czas prawo lub cały czas lewo, co pozwala osiągnąć wynik rzędu
+~21.78 ptk / epizod
+
+P - player, T - target, R - reward, A - action, Czy koniec
+P 52  T 21  R 63  A 0   False
+P 51  T 21  R 62  A 0   False
+P 50  T 21  R 61  A 0   False
+P 49  T 21  R 60  A 0   False
+P 48  T 21  R 59  A 0   False
+P 47  T 21  R 58  A 0   False
+P 46  T 21  R 57  A 0   False
+P 45  T 21  R 56  A 0   False
+P 44  T 21  R 55  A 0   False
+P 43  T 21  R 54  A 0   False
+P 42  T 21  R 53  A 0   False
+P 41  T 21  R 52  A 0   False
+P 40  T 21  R 51  A 0   False
+P 39  T 21  R 50  A 0   False
+P 38  T 21  R 49  A 0   False
+P 37  T 21  R 48  A 0   False
+P 36  T 21  R 47  A 0   False
+P 35  T 21  R 46  A 0   False
+P 34  T 21  R 45  A 0   False
+P 33  T 21  R 44  A 0   False
+P 32  T 21  R 43  A 0   False
+P 31  T 21  R 42  A 0   False
+P 30  T 21  R 41  A 0   False
+P 29  T 21  R 40  A 0   False
+P 28  T 21  R 39  A 0   False
+P 27  T 21  R 38  A 0   False
+P 26  T 21  R 37  A 0   False
+P 25  T 21  R 36  A 0   False
+P 24  T 21  R 35  A 0   False
+P 23  T 21  R 34  A 0   False
+P 22  T 21  R 33  A 0   False
+P 21  T 21  R 33  A 0   True
+P 05  T 38  R 63  A 0   False
+P 04  T 38  R 62  A 0   False
+P 03  T 38  R 61  A 0   False
+P 02  T 38  R 60  A 0   False
+P 01  T 38  R 59  A 0   False
+P 00  T 38  R 58  A 0   False
+P 00  T 38  R 57  A 0   False
+P 00  T 38  R 56  A 0   False
+P 00  T 38  R 55  A 0   False
+P 00  T 38  R 54  A 0   False
+P 00  T 38  R 53  A 0   False
+P 00  T 38  R 52  A 0   False
+P 00  T 38  R 51  A 0   False
+P 00  T 38  R 50  A 0   False
+P 00  T 38  R 49  A 0   False
+P 00  T 38  R 48  A 0   False
+P 00  T 38  R 47  A 0   False
+P 00  T 38  R 46  A 0   False
+P 00  T 38  R 45  A 0   False
+P 00  T 38  R 44  A 0   False
+P 00  T 38  R 43  A 0   False
+P 00  T 38  R 42  A 0   False
+P 00  T 38  R 41  A 0   False
+P 00  T 38  R 40  A 0   False
+P 00  T 38  R 39  A 0   False
+P 00  T 38  R 38  A 0   False
+P 00  T 38  R 37  A 0   False
+P 00  T 38  R 36  A 0   False
+P 00  T 38  R 35  A 0   False
+P 00  T 38  R 34  A 0   False
+P 00  T 38  R 33  A 0   False
+P 00  T 38  R 32  A 0   False
+P 00  T 38  R 31  A 0   False
+P 00  T 38  R 30  A 0   False
+P 00  T 38  R 29  A 0   False
+P 00  T 38  R 28  A 0   False
+P 00  T 38  R 27  A 0   False
+P 00  T 38  R 26  A 0   False
+P 00  T 38  R 25  A 0   False
+P 00  T 38  R 24  A 0   False
+P 00  T 38  R 23  A 0   False
+P 00  T 38  R 22  A 0   False
+P 00  T 38  R 21  A 0   False
+P 00  T 38  R 20  A 0   False
+P 00  T 38  R 19  A 0   False
+P 00  T 38  R 18  A 0   False
+P 00  T 38  R 17  A 0   False
+P 00  T 38  R 16  A 0   False
+P 00  T 38  R 15  A 0   False
+P 00  T 38  R 14  A 0   False
+P 00  T 38  R 13  A 0   False
+P 00  T 38  R 12  A 0   False
+P 00  T 38  R 11  A 0   False
+P 00  T 38  R 10  A 0   False
+P 00  T 38  R 09  A 0   False
+P 00  T 38  R 08  A 0   False
+P 00  T 38  R 07  A 0   False
+P 00  T 38  R 06  A 0   False
+P 00  T 38  R 05  A 0   False
+P 00  T 38  R 04  A 0   False
+P 00  T 38  R 03  A 0   False
+P 00  T 38  R 02  A 0   False
+P 00  T 38  R 01  A 0   False
+P 00  T 38  R 00  A 0   False
+P 00  T 38  R 00  A 0   True
+P 57  T 26  R 63  A 0   False
+P 56  T 26  R 62  A 0   False
+P 55  T 26  R 61  A 0   False
+P 54  T 26  R 60  A 0   False
+P 53  T 26  R 59  A 0   False
+P 52  T 26  R 58  A 0   False
+P 51  T 26  R 57  A 0   False
+P 50  T 26  R 56  A 0   False
+P 49  T 26  R 55  A 0   False
+P 48  T 26  R 54  A 0   False
+P 47  T 26  R 53  A 0   False
+P 46  T 26  R 52  A 0   False
+P 45  T 26  R 51  A 0   False
+P 44  T 26  R 50  A 0   False
+P 43  T 26  R 49  A 0   False
+P 42  T 26  R 48  A 0   False
+P 41  T 26  R 47  A 0   False
+P 40  T 26  R 46  A 0   False
+P 39  T 26  R 45  A 0   False
+P 38  T 26  R 44  A 0   False
+P 37  T 26  R 43  A 0   False
+P 36  T 26  R 42  A 0   False
+P 35  T 26  R 41  A 0   False
+P 34  T 26  R 40  A 0   False
+P 33  T 26  R 39  A 0   False
+P 32  T 26  R 38  A 0   False
+P 31  T 26  R 37  A 0   False
+P 30  T 26  R 36  A 0   False
+P 29  T 26  R 35  A 0   False
+P 28  T 26  R 34  A 0   False
+P 27  T 26  R 33  A 0   False
+P 26  T 26  R 33  A 0   True
