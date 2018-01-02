@@ -78,12 +78,17 @@ class QAbsoluteAgent(TensorflowAgent):
         sess = self.sess
         self.observation = observation
         #Probabilistically pick an action given our network outputs.
-        a_dist = sess.run(self.output,feed_dict={self.state_in:[observation]})
+        a_dist = sess.run(self.output,feed_dict={self.state_in:[observation]}).flatten()
         self.a_dist = a_dist
         
-        a = np.random.choice(a_dist[0],p=a_dist[0])
-        a = np.argmax(a_dist == a)
-        return a
+        rnd = np.add_newdocrandom.randint(64, size=2)
+        if rnd[0] > 50:
+            return rnd[1]
+        else:
+            a = np.random.choice(a_dist.size, p=a_dist, replace=False)
+            return a
+
+        
 
     def observe(self, observation, reward, action):
         self.memory_buffer.append([self.observation, action, reward, observation])
@@ -99,6 +104,7 @@ class QAbsoluteAgent(TensorflowAgent):
         memory_buffer = np.array(self.memory_buffer)
         self.memory_buffer = []
         memory_buffer[:,2] = self.discount_rewards(memory_buffer[:,2])
+        np.random.shuffle(memory_buffer)
          # posumuj nagrody mniejszając znaczenia nagrody wraz z kolejnymi akcjami
         feed_dict={# przekształcenie bufora w słownik
                 self.reward_holder:memory_buffer[:,2],

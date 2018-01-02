@@ -104,20 +104,11 @@ class Beacon2DRealtive(gym.Env):
     def _reset(self):
         self.reward = 64 * 4
         self.beacon = (int(self.np_random.uniform(0, 1, 1)[0] * self.size[0]), int(self.np_random.uniform(0, 1, 1)[0] * self.size[1]))
+        self.player = (int(self.np_random.uniform(0, 1, 1)[0] * self.size[0]), int(self.np_random.uniform(0, 1, 1)[0] * self.size[1]))
 
+        while self.player == self.beacon:
+            self.player = (int(self.np_random.uniform(0, 1, 1)[0] * self.size[0]), int(self.np_random.uniform(0, 1, 1)[0] * self.size[1]))
 
-        if self.np_random.uniform(0, 1, 1)[0] > 0.5:
-            xdir = 0.5
-        else:
-            xdir = -0.5
-
-        if self.np_random.uniform(0, 1, 1)[0] > 0.5:
-            ydir = 0.5
-        else:
-            ydir = -0.5
-
-
-        self.player = (int((self.beacon[0] + self.size[0] * xdir) % self.size[0]), int((self.beacon[1] + self.size[1] * ydir) % self.size[1]))
         self.steps_beyond_done = None
         return self._observation()
 

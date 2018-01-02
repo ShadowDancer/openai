@@ -1,0 +1,1 @@
+python train.py --env beacon1dabs-v0 --agent Beacon1dabs/q_absolute --reset_model

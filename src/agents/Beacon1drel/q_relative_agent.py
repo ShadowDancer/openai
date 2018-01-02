@@ -22,6 +22,7 @@ class QRelativeAgent(TensorflowAgent):
 
         self.gamma = flags.FLAGS.gamma
         self.lr = flags.FLAGS.lr
+        self.memory_buffer = []
 
         # parametry dla setup
         s_size = 64 # warstwa obserwacji
@@ -32,9 +33,11 @@ class QRelativeAgent(TensorflowAgent):
         self.state_in= tf.placeholder(shape=[None,s_size],dtype=tf.float32) # placeholder na bufor z obserwajcą
         hidden = slim.fully_connected(self.state_in,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta    
         hidden2 = slim.fully_connected(hidden,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta     
+        hidden3 = slim.fully_connected(hidden2,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta     
+
 
         #funkcja aktywacji: x > 0           Computes rectified linear: max(features, 0).
-        self.output = slim.fully_connected(hidden2,a_size,activation_fn =tf.nn.softmax,biases_initializer=None) # bufor z akcjami
+        self.output = slim.fully_connected(hidden3,a_size,activation_fn =tf.nn.softmax,biases_initializer=None) # bufor z akcjami
         # softmax :/
         self.chosen_action = tf.argmax(self.output,1) # wybrana akcja, po największej wartości na wyjściu
 
@@ -65,8 +68,6 @@ class QRelativeAgent(TensorflowAgent):
         self.update_batch = optimizer.apply_gradients(zip(self.gradient_holders,tvars))
 
     def setup(self):
-        
-        self.memory_buffer = [] # bufor na obserwacje
         #inicializuj tensorflow
         self.sess.run(tf.global_variables_initializer())    
         self.gradBuffer = self.sess.run(tf.trainable_variables())
@@ -99,6 +100,7 @@ class QRelativeAgent(TensorflowAgent):
         memory_buffer = np.array(self.memory_buffer)
         self.memory_buffer = []
         memory_buffer[:,2] = self.discount_rewards(memory_buffer[:,2])
+        np.random.shuffle(memory_buffer)
          # posumuj nagrody mniejszając znaczenia nagrody wraz z kolejnymi akcjami
         feed_dict={# przekształcenie bufora w słownik
                 self.reward_holder:memory_buffer[:,2],

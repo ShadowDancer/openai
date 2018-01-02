@@ -95,6 +95,7 @@ class QRelativeAgent(TensorflowAgent):
             return
 
         memory_buffer = np.array(self.memory_buffer)
+        np.random.shuffle(memory_buffer)
         self.memory_buffer = []
         memory_buffer[:,2] = self.discount_rewards(memory_buffer[:,2])
          # posumuj nagrody mniejszając znaczenia nagrody wraz z kolejnymi akcjami
