@@ -30,16 +30,21 @@ class Beacon2DRealtive(gym.Env):
         (1, -1)]
 
 
+    def _flat_pos(self, pos, width):
+        return pos[1] * width + pos[0]
+
     def _observation(self):
+         obs = np.zeros(self.size)
+         obs[self.beacon] = 1
 
+         obs2 = np.zeros(self.size)
+         obs2[self.player] = 1
 
-        obs = np.zeros(self.size)
-        obs[self.beacon] = 1
-        obs[self.player] = 2
-        return obs.flatten()
+         return np.concatenate([obs.flatten(), obs2.flatten()])
 
     def __init__(self):
-        self.size = (64, 64)
+        self.size = (5, 5)
+        self.timer = 0
         self.beacon = (0, 0)
         self.player = (0, 0)
 
@@ -67,34 +72,38 @@ class Beacon2DRealtive(gym.Env):
             
             if x < 0:
                 x = 0
+                
             if y < 0:
                 y = 0
+                
             if x >= self.size[0]:
                 x = self.size[0] - 1
+                
             if y >= self.size[1]:
                 y = self.size[1] - 1
 
             self.player = (x, y)
 
-        done = (self.player == self.beacon) or (self.reward == 0)
+        done = (self.player == self.beacon) or (self.timer == 0)
 
         if not done:
-            if self.reward > 0:
-                self.reward = self.reward - 1
+            if self.timer > 0:
+                self.timer = self.timer - 1
+            self.reward = -1
 
         elif self.steps_beyond_done is None:
-            # Pole just fell!
+            if (self.player == self.beacon):
+                self.reward = 1
             self.steps_beyond_done = 0
         else:
             if self.steps_beyond_done == 0:
                 logger.warning("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
             self.steps_beyond_done += 1
+            self.reward = 0
 
         obs = self._observation()
 
-        if self.viewer:
-            print('P ', self._format_tuple(self.player), ' T ', self._format_tuple(self.beacon), ' R', str(self.reward).zfill(2), ' A', action, ' ', done)
-
+       # print('P ', self._format_tuple(self.player), ' T ', self._format_tuple(self.beacon), ' R', str(self.reward).zfill(2), ' A', action, ':', self._format_tuple(self.offsets[action]), ' ', done)
         return obs, self.reward, done, {}
 
     def _format_tuple(self, t):
@@ -102,7 +111,8 @@ class Beacon2DRealtive(gym.Env):
 
 
     def _reset(self):
-        self.reward = 64 * 4
+        self.timer = self.size[0] * 4
+        self.reward = -1
         self.beacon = (int(self.np_random.uniform(0, 1, 1)[0] * self.size[0]), int(self.np_random.uniform(0, 1, 1)[0] * self.size[1]))
         self.player = (int(self.np_random.uniform(0, 1, 1)[0] * self.size[0]), int(self.np_random.uniform(0, 1, 1)[0] * self.size[1]))
 
@@ -113,6 +123,7 @@ class Beacon2DRealtive(gym.Env):
         return self._observation()
 
     def _render(self, mode='human', close=False):
+        return
         if close:
             if self.viewer is not None:
                 self.viewer.close()
@@ -126,30 +137,30 @@ class Beacon2DRealtive(gym.Env):
             from gym.envs.classic_control import rendering
             self.viewer = rendering.Viewer(screen_width, screen_height)
 
-            # polygons = []
-            # self.polygons = polygons
+            polygons = []
+            self.polygons = polygons
 
 
-            # dotsize = 20
-            # offsetx = 10
-            # offsety = 100
+            dotsize = 20
+            offsetx = 10
+            offsety = 100
             
-            # for i in range(self.size):
-            #     l,r,t,b = -dotsize/2 + offsetx, dotsize/2 + offsetx, dotsize/2 + offsety, -dotsize/2 + offsety
-            #     poly = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
-            #     #polyTrans = rendering.Transform()
-            #     #polyTrans.set_translation(i * dotsize, dotsize/2.0)
-            #     #poly.add_attr(polyTrans)
-            #     polygons.append(poly)
-            #     self.viewer.add_geom(poly)
+            for i in range(self.size[0]):
+                l,r,t,b = -dotsize/2 + offsetx, dotsize/2 + offsetx, dotsize/2 + offsety, -dotsize/2 + offsety
+                poly = rendering.FilledPolygon([(l,b), (l,t), (r,t), (r,b)])
+                #polyTrans = rendering.Transform()
+                #polyTrans.set_translation(i * dotsize, dotsize/2.0)
+                #poly.add_attr(polyTrans)
+                polygons.append(poly)
+                self.viewer.add_geom(poly)
 
-        # for i in range(self.size):
-        #     if self.beacon == i:
-        #         self.polygons[i].set_color(.5,.5,.8)
-        #     elif self.player == i:
-        #         self.polygons[i].set_color(.8,.6,.4)
-        #     else:
-        #         self.polygons[i].set_color(0,0,0)
+        for i in range(self.size[0]):
+            if self.beacon == i:
+                self.polygons[i].set_color(.5,.5,.8)
+            elif self.player == i:
+                self.polygons[i].set_color(.8,.6,.4)
+            else:
+                self.polygons[i].set_color(0,0,0)
 
         if self.state is None: return None
         return self.viewer.render(return_rgb_array = mode=='rgb_array')

@@ -1,1 +1,25 @@
+#classic control
+-- cartpole
+python train.py --env CartPole-v0 --agent CartPole-v0/q_network
+python enjoy.py --env CartPole-v0 --agent CartPole-v0/q_network --visualize
+
+-- acrobot
+-- ma za zadanie rozbujanie wachadła w ten sposób, aby podnieść je o długość ramienia nad siebie
+-- po ok, 100 epizodach osiągnął sprawność rzędu 100, tzn po 100 klatkach udało się obrócić wahadło
+-- po długim treningu osiągnął wynik rzędu 85 klatek (średnie ze 100 epizodów)
+-- nagroda: -1 jeżli słupek jest powyżej, wpp. 0
+python train.py --env Acrobot-v1 --agent Acrobot-v1/q_network
+python enjoy.py --env Acrobot-v1 --agent Acrobot-v1/q_network --visualize
+
+-- moutain
+-- cieżko nauczyć, widać, że nawet po bardzo długim treningu sieć nie może złapać ani jednego "pozytynego doświadczenia"
+python train.py --env MountainCar-v0 --agent MountainCar-v0/q_network
+
+--pendulum upswing
+-- uczy się ładnie, ale długo, wynika to z faktu, że najpier uczy się rozbując wachadło, a następnie utrzymać je w pionie
+python train.py --env Pendulum-v0 --agent Pendulum-v0/q_network
+python enjoy.py --env Pendulum-v0 --agent Pendulum-v0/q_network --visualize
+
+# sc2
 python train.py --env beacon1dabs-v0 --agent Beacon1dabs/q_absolute --reset_model
+python train.py --env beacon1drel-v0 --agent Beacon1drel/q_relative --reset_model

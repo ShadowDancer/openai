@@ -9,9 +9,8 @@ import matplotlib.pyplot as plt
 import shutil
 
 from absl import flags
-flags.DEFINE_float("gamma", 0.99, "Współczynnik określający, jak ważne są przyszłe doświadczenia")
+flags.DEFINE_float("gamma", 0.99, "Współczynnik określający szybkość uczenia")
 flags.DEFINE_float("lr", 1e-2, "Współczynnik określający szybkość uczenia")
-flags.DEFINE_float("hidden", 8, "Współczynnik określający szybkość uczenia")
 
 
 

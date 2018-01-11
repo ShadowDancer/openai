@@ -21,14 +21,16 @@ class Beacon1DAbsolute(gym.Env):
 
     def _observation(self):
 
-
         obs = np.zeros(self.size)
         obs[self.beacon] = 1
-        obs[self.player] = 2
-        return obs
+
+        obs2 = np.zeros(self.size)
+        obs2[self.player] = 1
+
+        return np.concatenate([obs, obs2])
 
     def __init__(self):
-        self.size = 64
+        self.size = 16
         self.beacon = 0
         self.player = 0
 
@@ -38,7 +40,8 @@ class Beacon1DAbsolute(gym.Env):
         self._seed()
         self.viewer = None
         self.state = None
-        self.reward = 100
+        self.timer = self.size + self.size /2
+        self.reward = 0
 
         self.steps_beyond_done = None
 
@@ -50,6 +53,10 @@ class Beacon1DAbsolute(gym.Env):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
 
+
+        
+        done = (self.player == self.beacon) or (self.timer == 0)
+
         if self.beacon != self.player:
             if action < self.player and self.player > 0:
                 self.player = self.player - 1
@@ -57,16 +64,16 @@ class Beacon1DAbsolute(gym.Env):
                 self.player = self.player + 1
 
 
-
-        done = (self.player == self.beacon) or (self.reward == 0)
-
         if not done:
-            if self.reward > 0:
-                self.reward = abs(self.beacon - self.player)
+            self.timer = self.timer - 1
+            self.reward = -1
 
         elif self.steps_beyond_done is None:
-            # Pole just fell!
             self.steps_beyond_done = 0
+            if self.player == self.beacon:
+                self.reward = 1
+            else:
+                self.reward = 0
         else:
             if self.steps_beyond_done == 0:
                 logger.warning("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
@@ -74,13 +81,13 @@ class Beacon1DAbsolute(gym.Env):
 
         obs = self._observation()
 
-        if self.viewer:
-            print('P', str(self.player).zfill(2), ' T', str(self.beacon).zfill(2), ' R', str(self.reward).zfill(2), ' A', action, ' ', done)
+        #print('P', str(self.player).zfill(2), ' T', str(self.beacon).zfill(2), ' R', str(self.reward).zfill(2), ' A', action, ' T',  str(self.timer).zfill(2), ' ', done)
 
         return obs, self.reward, done, {}
 
     def _reset(self):
-        self.reward = 64
+        self.reward = 0
+        self.timer = self.size
         self.beacon = int(self.np_random.uniform(0, 1, 1)[0] * self.size)
         self.player = int(self.np_random.uniform(0, 1, 1)[0] * self.size)
 

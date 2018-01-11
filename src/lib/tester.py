@@ -7,7 +7,7 @@ from absl import flags
 import time
 
 FLAGS = flags.FLAGS
-flags.DEFINE_integer("episodes", 100 * 100, "Ilość gier do zagrania")
+flags.DEFINE_integer("episodes", 100 * 100 * 100, "Ilość gier do zagrania")
 flags.DEFINE_integer("frames", 4000, "Maksymalna ilość klatek/gra")
 flags.DEFINE_string("name", 'defualt', "Nazwa symulacji doklejana do pliku")
 flags.DEFINE_boolean("visualize", False, "Czy renderować środowisko")
@@ -49,14 +49,15 @@ def run_agent(agent, env, learn=True):
             observation, reward, done, info = env.step(action)
             if learn:    
                 agent.observe(observation, reward, action)
-            current_reward = reward
+            current_reward += reward
             if done:
                 rewards.append(current_reward)
                 if len(rewards) > 100:
                     rewards.pop(0)
                 if episode > 0 and ((episode + 1) % 100 == 0):
                     mean = np.mean(rewards)
-                    print("100 episodes reward mean: " + format_float(mean))
+                    std = np.std(rewards)
+                    print("100 episodes reward mean: " + format_float(mean) + " std: " + format_float(std))
                     if learn and len(means) > 5 and mean > max(means):
                         agent.save(file)
                         print('Saving agent with score ' + format_float(mean) + ' in ' + file)

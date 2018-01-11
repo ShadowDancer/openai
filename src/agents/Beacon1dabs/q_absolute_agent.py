@@ -10,7 +10,7 @@ import shutil
 
 from absl import flags
 flags.DEFINE_float("gamma", 0.99, "Współczynnik określający, jak ważne są przyszłe doświadczenia")
-flags.DEFINE_float("lr", 1e-2, "Współczynnik określający szybkość uczenia")
+flags.DEFINE_float("lr", 1e-5, "Współczynnik określający szybkość uczenia")
 flags.DEFINE_float("hidden", 8, "Współczynnik określający szybkość uczenia")
 
 
@@ -24,17 +24,19 @@ class QAbsoluteAgent(TensorflowAgent):
         self.lr = flags.FLAGS.lr
 
         # parametry dla setup
-        s_size = 64 # warstwa obserwacji
-        h_size = 64 # warstwa ukryta
-        a_size = 64 # warstwa akcji
+        s_size = 32 # warstwa obserwacji
+        h_size = 16 # warstwa ukryta
+        a_size = 16 # warstwa akcji
 
         #feed forwards część
         self.state_in= tf.placeholder(shape=[None,s_size],dtype=tf.float32) # placeholder na bufor z obserwajcą
-        hidden = slim.fully_connected(self.state_in,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta    
-        hidden2 = slim.fully_connected(hidden,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta     
-
+        hidden = slim.fully_connected(self.state_in,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta
+        hidden2 = slim.fully_connected(hidden,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta
+        hidden3 = slim.fully_connected(hidden2,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta
+        hidden4 = slim.fully_connected(hidden3,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta
+        hidden5 = slim.fully_connected(hidden4,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta
         #funkcja aktywacji: x > 0           Computes rectified linear: max(features, 0).
-        self.output = slim.fully_connected(hidden2,a_size,activation_fn =tf.nn.softmax,biases_initializer=None) # bufor z akcjami
+        self.output = slim.fully_connected(hidden5,a_size,activation_fn =tf.nn.softmax,biases_initializer=None) # bufor z akcjami
         # softmax :/
         self.chosen_action = tf.argmax(self.output,1) # wybrana akcja, po największej wartości na wyjściu
 
@@ -80,13 +82,8 @@ class QAbsoluteAgent(TensorflowAgent):
         #Probabilistically pick an action given our network outputs.
         a_dist = sess.run(self.output,feed_dict={self.state_in:[observation]}).flatten()
         self.a_dist = a_dist
-        
-        rnd = np.add_newdocrandom.randint(64, size=2)
-        if rnd[0] > 50:
-            return rnd[1]
-        else:
-            a = np.random.choice(a_dist.size, p=a_dist, replace=False)
-            return a
+        a = np.random.choice(a_dist.size, p=a_dist, replace=False)
+        return a
 
         
 

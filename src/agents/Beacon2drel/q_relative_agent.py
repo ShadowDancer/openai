@@ -10,7 +10,7 @@ import shutil
 
 from absl import flags
 flags.DEFINE_float("gamma", 0.9, "Współczynnik określający, jak ważne są przyszłe doświadczenia")
-flags.DEFINE_float("lr", 1e-2, "Współczynnik określający szybkość uczenia")
+flags.DEFINE_float("lr", 1e-3, "Współczynnik określający szybkość uczenia")
 flags.DEFINE_float("hidden", 8, "Współczynnik określający szybkość uczenia")
 
 
@@ -24,15 +24,24 @@ class QRelativeAgent(TensorflowAgent):
         self.lr = flags.FLAGS.lr
 
         # parametry dla setup
-        s_size = 64*64 # warstwa obserwacji
-        h_size = 64*64 # warstwa ukryta
+        x = 2
+        s = 5*5
+        s_size = s * x# warstwa obserwacji
+        h_size = s * x # warstwa ukryta
         a_size = 8 # warstwa akcji
 
         #feed forwards część
         self.state_in= tf.placeholder(shape=[None,s_size],dtype=tf.float32) # placeholder na bufor z obserwajcą
         hidden = slim.fully_connected(self.state_in,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta    
+        hidden2 = slim.fully_connected(hidden,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta    
+        hidden3 = slim.fully_connected(hidden2,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta    
+        hidden4 = slim.fully_connected(hidden3,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta    
+        hidden5 = slim.fully_connected(hidden4,h_size,biases_initializer=None,activation_fn=tf.nn.relu) # warstwa ukryta    
+
+
+
         #funkcja aktywacji: x > 0           Computes rectified linear: max(features, 0).
-        self.output = slim.fully_connected(hidden,a_size,activation_fn =tf.nn.softmax,biases_initializer=None) # bufor z akcjami
+        self.output = slim.fully_connected(hidden5,a_size,activation_fn =tf.nn.softmax,biases_initializer=None) # bufor z akcjami
         # softmax :/
         self.chosen_action = tf.argmax(self.output,1) # wybrana akcja, po największej wartości na wyjściu
 
@@ -76,10 +85,8 @@ class QRelativeAgent(TensorflowAgent):
         sess = self.sess
         self.observation = observation
         #Probabilistically pick an action given our network outputs.
-        a_dist = sess.run(self.output,feed_dict={self.state_in:[observation]})
-        self.a_dist = a_dist
-        
-        a = np.random.choice(a_dist[0],p=a_dist[0])
+        a_dist = sess.run(self.output,feed_dict={self.state_in:[observation]})[0]
+        a = np.random.choice(a_dist,p=a_dist)
         a = np.argmax(a_dist == a)
         return a
 
