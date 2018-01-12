@@ -27,7 +27,8 @@ class Beacon1DAbsolute(gym.Env):
         obs2 = np.zeros(self.size)
         obs2[self.player] = 1
 
-        return np.concatenate([obs, obs2])
+        res = np.concatenate([obs, obs2])
+        return res
 
     def __init__(self):
         self.size = 16
@@ -52,28 +53,25 @@ class Beacon1DAbsolute(gym.Env):
     def _step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
-
-
-        
-        done = (self.player == self.beacon) or (self.timer == 0)
-
         if self.beacon != self.player:
             if action < self.player and self.player > 0:
                 self.player = self.player - 1
             if action > self.player and self.player < self.size - 1:
                 self.player = self.player + 1
+        
+        done = (self.player == self.beacon) or (self.timer == 0)
 
+        if self.player == self.beacon:
+            self.reward = 1
+        else:
+            self.reward = -1
 
         if not done:
-            self.timer = self.timer - 1
-            self.reward = -1
+            if self.timer > 0:
+                self.timer = self.timer - 1
 
         elif self.steps_beyond_done is None:
             self.steps_beyond_done = 0
-            if self.player == self.beacon:
-                self.reward = 1
-            else:
-                self.reward = 0
         else:
             if self.steps_beyond_done == 0:
                 logger.warning("You are calling 'step()' even though this environment has already returned done = True. You should always call 'reset()' once you receive 'done = True' -- any further steps are undefined behavior.")
@@ -81,13 +79,14 @@ class Beacon1DAbsolute(gym.Env):
 
         obs = self._observation()
 
-        #print('P', str(self.player).zfill(2), ' T', str(self.beacon).zfill(2), ' R', str(self.reward).zfill(2), ' A', action, ' T',  str(self.timer).zfill(2), ' ', done)
+        if self.viewer:
+            print('P', str(self.player).zfill(2), ' T', str(self.beacon).zfill(2), ' R', str(self.reward).zfill(2), ' A', action, ' ', done)
 
         return obs, self.reward, done, {}
 
     def _reset(self):
         self.reward = 0
-        self.timer = self.size
+        self.timer = self.size + self.size / 2
         self.beacon = int(self.np_random.uniform(0, 1, 1)[0] * self.size)
         self.player = int(self.np_random.uniform(0, 1, 1)[0] * self.size)
 
@@ -139,7 +138,6 @@ class Beacon1DAbsolute(gym.Env):
 
         if self.state is None: return None
         return self.viewer.render(return_rgb_array = mode=='rgb_array')
-
 
 from gym.envs.registration import register
 

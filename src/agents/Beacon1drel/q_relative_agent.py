@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 import shutil
 
 from absl import flags
-flags.DEFINE_float("gamma", 0.9, "Współczynnik określający, jak ważne są przyszłe doświadczenia")
-flags.DEFINE_float("lr", 1e-2, "Współczynnik określający szybkość uczenia")
+flags.DEFINE_float("gamma", 0.99, "Współczynnik określający, jak ważne są przyszłe doświadczenia")
+flags.DEFINE_float("lr", 1e-3, "Współczynnik określający szybkość uczenia")
 flags.DEFINE_float("hidden", 8, "Współczynnik określający szybkość uczenia")
 
 
@@ -25,8 +25,9 @@ class QRelativeAgent(TensorflowAgent):
         self.memory_buffer = []
 
         # parametry dla setup
-        s_size = 64 # warstwa obserwacji
-        h_size = 64 # warstwa ukryta
+        s = 16
+        s_size = s * 2 # warstwa obserwacji
+        h_size = s * 2 # warstwa ukryta
         a_size = 2 # warstwa akcji
 
         #feed forwards część
@@ -80,8 +81,6 @@ class QRelativeAgent(TensorflowAgent):
         self.observation = observation
         #Probabilistically pick an action given our network outputs.
         a_dist = sess.run(self.output,feed_dict={self.state_in:[observation]})
-        self.a_dist = a_dist
-        
         a = np.random.choice(a_dist[0],p=a_dist[0])
         a = np.argmax(a_dist == a)
         return a

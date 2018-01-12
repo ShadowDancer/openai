@@ -22,4 +22,13 @@ python enjoy.py --env Pendulum-v0 --agent Pendulum-v0/q_network --visualize
 
 # sc2
 python train.py --env beacon1dabs-v0 --agent Beacon1dabs/q_absolute --reset_model
-python train.py --env beacon1drel-v0 --agent Beacon1drel/q_relative --reset_model
+
+#1d rel
+python train.py --env beacon1drel-v0 --agent Beacon1drel/q_relative
+python enjoy.py --env beacon1drel-v0 --agent Beacon1drel/q_relative --visualize
+#1d q_abs
+python train.py --env beacon1dabs-v0 --agent Beacon1dabs/q_absolute
+python enjoy.py --env beacon1dabs-v0 --agent Beacon1dabs/q_absolute --visualize
+
+
+python train.py --env beacon2drel-v0 --agent Beacon2drel/q_relative --reset_model

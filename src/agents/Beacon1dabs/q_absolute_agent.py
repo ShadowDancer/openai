@@ -10,7 +10,7 @@ import shutil
 
 from absl import flags
 flags.DEFINE_float("gamma", 0.99, "Współczynnik określający, jak ważne są przyszłe doświadczenia")
-flags.DEFINE_float("lr", 1e-5, "Współczynnik określający szybkość uczenia")
+flags.DEFINE_float("lr", 1e-3, "Współczynnik określający szybkość uczenia")
 flags.DEFINE_float("hidden", 8, "Współczynnik określający szybkość uczenia")
 
 
@@ -20,12 +20,13 @@ class QAbsoluteAgent(TensorflowAgent):
     def __init__(self):
         TensorflowAgent.__init__(self)
 
+        self.memory_buffer = [] # bufor na obserwacje
         self.gamma = flags.FLAGS.gamma
         self.lr = flags.FLAGS.lr
 
         # parametry dla setup
         s_size = 32 # warstwa obserwacji
-        h_size = 16 # warstwa ukryta
+        h_size = 32 # warstwa ukryta
         a_size = 16 # warstwa akcji
 
         #feed forwards część
@@ -68,7 +69,6 @@ class QAbsoluteAgent(TensorflowAgent):
 
     def setup(self):
         
-        self.memory_buffer = [] # bufor na obserwacje
         #inicializuj tensorflow
         self.sess.run(tf.global_variables_initializer())    
         self.gradBuffer = self.sess.run(tf.trainable_variables())
@@ -80,9 +80,10 @@ class QAbsoluteAgent(TensorflowAgent):
         sess = self.sess
         self.observation = observation
         #Probabilistically pick an action given our network outputs.
-        a_dist = sess.run(self.output,feed_dict={self.state_in:[observation]}).flatten()
+        a_dist = sess.run(self.output,feed_dict={self.state_in:[observation]})[0]
         self.a_dist = a_dist
-        a = np.random.choice(a_dist.size, p=a_dist, replace=False)
+        a = np.random.choice(a_dist, p=a_dist, replace=False)
+        a = np.argmax(a_dist == a)
         return a
 
         
