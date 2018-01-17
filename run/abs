@@ -14,6 +14,8 @@ python enjoy.py --env Acrobot-v1 --agent Acrobot-v1/q_network --visualize
 -- moutain
 -- cieżko nauczyć, widać, że nawet po bardzo długim treningu sieć nie może złapać ani jednego "pozytynego doświadczenia"
 python train.py --env MountainCar-v0 --agent MountainCar-v0/q_network
+python enjoy.py --env MountainCar-v0 --agent MountainCar-v0/q_network --visualize
+
 
 --pendulum upswing
 -- uczy się ładnie, ale długo, wynika to z faktu, że najpier uczy się rozbując wachadło, a następnie utrzymać je w pionie
@@ -31,4 +33,5 @@ python train.py --env beacon1dabs-v0 --agent Beacon1dabs/q_absolute
 python enjoy.py --env beacon1dabs-v0 --agent Beacon1dabs/q_absolute --visualize
 
 
-python train.py --env beacon2drel-v0 --agent Beacon2drel/q_relative --reset_model
+python train.py --env beacon2drel-v0 --agent Beacon2drel/q_relative
+python enjoy.py --env beacon2drel-v0 --agent Beacon2drel/q_relative --visualize

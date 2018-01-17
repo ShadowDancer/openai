@@ -40,7 +40,7 @@ def run(learn=True):
     with get_agent(env_name) as agent:
         #scr_env =  gym.make(env_name)
         #id = scr_env.env._spec
-        #env = wrappers.Monitor(scr_env, '/tmp/cartpole-experiment-1', force=True)
+        #env = wrappers.Monitor(scr_env, '/tmp/experiment/' + env_name, force=True)
         #env.env._spec = id
         env =  gym.make(env_name)
         run_agent(agent, env, learn=learn)

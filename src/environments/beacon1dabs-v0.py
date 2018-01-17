@@ -80,7 +80,7 @@ class Beacon1DAbsolute(gym.Env):
         obs = self._observation()
 
         if self.viewer:
-            print('P', str(self.player).zfill(2), ' T', str(self.beacon).zfill(2), ' R', str(self.reward).zfill(2), ' A', action, ' ', done)
+            print('P', str(self.player).zfill(2), ' T', str(self.beacon).zfill(2), ' R', str(self.reward).zfill(2), ' A', str(action).zfill(2), ' ', done)
 
         return obs, self.reward, done, {}
 
